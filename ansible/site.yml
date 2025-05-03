@@ -1,0 +1,45 @@
+- name: Configure WordPress server
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Update apt packages
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - nginx
+          - php
+          - php-fpm
+          - php-mysql
+          - mariadb-client
+          - unzip
+          - curl
+        state: present
+
+    - name: Download latest WordPress
+      get_url:
+        url: https://wordpress.org/latest.tar.gz
+        dest: /tmp/wordpress.tar.gz
+
+    - name: Extract WordPress
+      unarchive:
+        src: /tmp/wordpress.tar.gz
+        dest: /var/www/html/
+        remote_src: yes
+
+    - name: Ensure proper permissions
+      file:
+        path: /var/www/html/wordpress
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+        recurse: yes
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
