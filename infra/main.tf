@@ -1,6 +1,6 @@
 resource "aws_key_pair" "wp_key" {
   key_name   = var.ssh_key_name
-  public_key = file("~/.ssh/id_rsa.pub")
+  public_key = file("/home/john/.ssh/id_rsa.pub")
 }
 
 resource "aws_security_group" "wp_sg" {
@@ -58,8 +58,4 @@ resource "aws_db_instance" "wp_db" {
   skip_final_snapshot  = true
   publicly_accessible  = true
   vpc_security_group_ids = [aws_security_group.wp_sg.id]
-}
-
-output "ec2_public_ip" {
-  value = aws_instance.wordpress.public_ip
 }
