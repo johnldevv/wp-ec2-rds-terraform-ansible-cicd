@@ -7,6 +7,13 @@
       apt:
         update_cache: yes
 
+    - name: Remove Apache if present (port 80 conflict)
+      apt:
+        name: apache2
+        state: absent
+        purge: yes
+        autoremove: yes
+
     - name: Install required packages
       apt:
         name:
@@ -38,6 +45,37 @@
         group: www-data
         mode: '0755'
         recurse: yes
+
+    - name: Remove default index.html (conflict with WordPress)
+      file:
+        path: /var/www/html/index.html
+        state: absent
+
+    - name: Configure Nginx for WordPress
+      copy:
+        dest: /etc/nginx/sites-available/default
+        content: |
+          server {
+              listen 80 default_server;
+              listen [::]:80 default_server;
+              root /var/www/html/wordpress;
+              index index.php index.html index.htm;
+
+              server_name _;
+
+              location / {
+                  try_files $uri $uri/ =404;
+              }
+
+              location ~ \.php$ {
+                  include snippets/fastcgi-php.conf;
+                  fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+              }
+
+              location ~ /\.ht {
+                  deny all;
+              }
+          }
 
     - name: Restart Nginx
       service:
