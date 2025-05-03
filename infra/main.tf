@@ -59,3 +59,7 @@ resource "aws_db_instance" "wp_db" {
   publicly_accessible  = true
   vpc_security_group_ids = [aws_security_group.wp_sg.id]
 }
+
+output "ec2_public_ip" {
+  value = aws_instance.wordpress.public_ip
+}
