@@ -14,17 +14,21 @@
         purge: yes
         autoremove: yes
 
-    - name: Install required packages
+    - name: Install only required PHP packages (without Apache)
       apt:
         name:
           - nginx
-          - php
           - php-fpm
+          - php-cli
           - php-mysql
+          - php-curl
+          - php-xml
+          - php-mbstring
           - mariadb-client
           - unzip
           - curl
         state: present
+        update_cache: yes
 
     - name: Download latest WordPress
       get_url:
